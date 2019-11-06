@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Detect Faces Sample</title>
+	<script src="/js/jquery-3.2.1.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/dist/css/layout-grid.min.css" />
+	<link rel="stylesheet" href="/css/theme.css" type="text/css" />
+	<link rel="stylesheet" href="/css/custom.css" type="text/css" />
+	<link rel="stylesheet" href="/css/simple-grid.css" type="text/css" />
+	<script type="text/javascript" src="/js/admin-demo.js"></script>
+	<script src="/js/camvas.js"></script>
+	<script src="/js/pico.js"></script>
+	<script src="/js/lploc.js"></script>
+
+</head>
+<script>
+	var initialized = false;
+	window.onload = function() {
+		if (initialized)
+			return; // if yes, then do not initialize everything again
+		var update_memory = pico.instantiate_detection_memory(5); // we will use the detecions of the last 5 frames
+		var facefinder_classify_region = function (r, c, s, pixels, ldim) { return -1.0; };
+		var cascadeurl = '/bin/facefinder';
+		fetch(cascadeurl).then(function (response) {
+			response.arrayBuffer().then(function (buffer) {
+				var bytes = new Int8Array(buffer);
+				facefinder_classify_region = pico.unpack_cascade(bytes);
+				console.log('* facefinder loaded');
+			})
+		})
+		var do_puploc = function (r, c, s, nperturbs, pixels, nrows, ncols, ldim) { return [-1.0, -1.0]; };
+		var puplocurl = '/bin/puploc.bin';
+		fetch(puplocurl).then(function (response) {
+			response.arrayBuffer().then(function (buffer) {
+				var bytes = new Int8Array(buffer);
+				do_puploc = lploc.unpack_localizer(bytes);
+				console.log('* puploc loaded');
+			})
+		})
+		var ctx = document.getElementsByTagName('canvas')[0].getContext('2d');
+		function rgba_to_grayscale(rgba, nrows, ncols) {
+			var gray = new Uint8Array(nrows * ncols);
+			for (var r = 0; r < nrows; ++r)
+				for (var c = 0; c < ncols; ++c)
+					gray[r * ncols + c] = (2 * rgba[r * 4 * ncols + 4 * c + 0] + 7 * rgba[r * 4 * ncols + 4 * c + 1] + 1 * rgba[r * 4 * ncols + 4 * c + 2]) / 10;
+			return gray;
+		}
+		var processfn = function (video, dt) {
+			ctx.drawImage(video, 0, 0, 320, 240);
+			var rgba = ctx.getImageData(0, 0, 640, 480).data;
+			image = {
+				"pixels": rgba_to_grayscale(rgba, 480, 640),
+				"nrows": 480,
+				"ncols": 640,
+				"ldim": 640
+			}
+			params = {
+				"shiftfactor": 0.1, // move the detection window by 10% of its size
+				"minsize": 100,     // minimum size of a face
+				"maxsize": 1000,    // maximum size of a face
+				"scalefactor": 1.1  // for multiscale processing: resize the detection window by 10% when moving to the higher scale
+			}
+			dets = pico.run_cascade(image, facefinder_classify_region, params);
+			dets = update_memory(dets);
+			dets = pico.cluster_detections(dets, 0.2); // set IoU threshold to 0.2
+
+			for (i = 0; i < dets.length; ++i)
+				if (dets[i][3] > 50.0) {
+					if(!isDetec)
+						{
+							
+						}
+					isDetec=true;
+				}
+		}
+		var isDetec;
+		var mycamvas = new camvas(ctx, processfn);
+		initialized = true;
+	}
+</script>
+
+<body>
+	<div class="section" id="reorder-demo">
+		<div data-arrange="lt-grid" class="lt-container
+				lt-xs-h-16
+				lt-sm-h-12
+				lt-md-h-8
+				lt-lg-h-6">
+
+			<div draggable="true" class="lt 
+					lt-xs-x-0 lt-xs-y-0 lt-xs-w-1 lt-xs-h-1 
+					lt-sm-x-0 lt-sm-y-0 lt-sm-w-1 lt-sm-h-1 
+					lt-md-x-0 lt-md-y-0 lt-md-w-1 lt-md-h-1 
+					lt-lg-x-0 lt-lg-y-0 lt-lg-w-1 lt-lg-h-1">
+					<div class="lt-body note">
+						<canvas width=640 height=480></canvas>
+					</div>
+			</div>
+			<div draggable="true" class="lt
+					lt-xs-x-0 lt-xs-y-1 lt-xs-w-1 lt-xs-h-2
+					lt-sm-x-1 lt-sm-y-0 lt-sm-w-1 lt-sm-h-2
+					lt-md-x-2 lt-md-y-0 lt-md-w-1 lt-md-h-2
+					lt-lg-x-1 lt-lg-y-0 lt-lg-w-1 lt-lg-h-2">
+				<div class="lt-body note">
+					<div>Your results will appear below:
+						<pre id="results">	</pre>
+					</div>
+				</div>
+			</div>
+			<div draggable="true" class="lt
+					lt-xs-x-0 lt-xs-y-3 lt-xs-w-1 lt-xs-h-1
+					lt-sm-x-0 lt-sm-y-1 lt-sm-w-1 lt-sm-h-1
+					lt-md-x-1 lt-md-y-0 lt-md-w-1 lt-md-h-1
+					lt-lg-x-0 lt-lg-y-1 lt-lg-w-1 lt-lg-h-1">
+				<div class="lt-body note">
+					
+				</div>
+			</div>
+			<div draggable="true" class="lt
+					lt-xs-x-0 lt-xs-y-4 lt-xs-w-1 lt-xs-h-2
+					lt-sm-x-0 lt-sm-y-2 lt-sm-w-2 lt-sm-h-2
+					lt-md-x-0 lt-md-y-1 lt-md-w-2 lt-md-h-2
+					lt-lg-x-2 lt-lg-y-0 lt-lg-w-2 lt-lg-h-2">
+				<div class="lt-body note">
+					<h3>4</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

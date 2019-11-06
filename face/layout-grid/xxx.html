@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Detect Faces Sample</title>
+        <script src="js/jquery-3.2.1.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="dist/css/layout-grid.min.css" />
+		<link rel="stylesheet" href="css/theme.css" type="text/css" />
+		<link rel="stylesheet" href="css/custom.css" type="text/css" />
+		<link rel="stylesheet" href="css/simple-grid.css" type="text/css" />
+		<!-- <script type="text/javascript" src="dist/js/layout-grid.min.js"></script>
+		<script type="text/javascript" src="js/admin-demo.js"></script>
+		<script type="text/javascript" src="js/theme.js"></script>
+		-->
+
+    </head>
+    <body>
+	<div class="section" id="reorder-demo">
+		<div data-arrange="lt-grid"
+			class="lt-container
+			lt-xs-h-16
+			lt-sm-h-12
+			lt-md-h-8
+			lt-lg-h-6">
+
+			<div draggable="true" class="lt 
+				lt-xs-x-0 lt-xs-y-0 lt-xs-w-1 lt-xs-h-1 
+				lt-sm-x-0 lt-sm-y-0 lt-sm-w-1 lt-sm-h-1 
+				lt-md-x-0 lt-md-y-0 lt-md-w-1 lt-md-h-1 
+				lt-lg-x-0 lt-lg-y-0 lt-lg-w-1 lt-lg-h-1">
+				<div class="lt-body note">
+					<div id="my_camera"></div>
+					<form >
+					  <input type=button class="btn btn-primary" value="Take Snapshot" onClick="take_snapshot()">
+					</form>
+				</div>
+			</div>
+			<div draggable="true" class="lt
+				lt-xs-x-0 lt-xs-y-1 lt-xs-w-1 lt-xs-h-2
+				lt-sm-x-1 lt-sm-y-0 lt-sm-w-1 lt-sm-h-2
+				lt-md-x-2 lt-md-y-0 lt-md-w-1 lt-md-h-2
+				lt-lg-x-1 lt-lg-y-0 lt-lg-w-1 lt-lg-h-2">
+				<div class="lt-body note">
+					<div>Your results will appear below: 
+						<pre id="results">	</pre>
+					</div>
+				</div>
+			</div>
+			<div draggable="true" class="lt
+				lt-xs-x-0 lt-xs-y-3 lt-xs-w-1 lt-xs-h-1
+				lt-sm-x-0 lt-sm-y-1 lt-sm-w-1 lt-sm-h-1
+				lt-md-x-1 lt-md-y-0 lt-md-w-1 lt-md-h-1
+				lt-lg-x-0 lt-lg-y-1 lt-lg-w-1 lt-lg-h-1">
+				<div class="lt-body note">
+					<canvas id="viewport" width="640" height="480"></canvas>
+				</div>
+			</div>
+			<div draggable="true" class="lt
+				lt-xs-x-0 lt-xs-y-4 lt-xs-w-1 lt-xs-h-2
+				lt-sm-x-0 lt-sm-y-2 lt-sm-w-2 lt-sm-h-2
+				lt-md-x-0 lt-md-y-1 lt-md-w-2 lt-md-h-2
+				lt-lg-x-2 lt-lg-y-0 lt-lg-w-2 lt-lg-h-2">
+				<div class="lt-body note">
+					<h3>4</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		
+		
+
+		
+
+		
+		</div>
+		<script type="text/javascript" src="js/webcam.js"></script>
+
+		<!-- Configure a few settings and attach camera -->
+		<script language="JavaScript">
+		 Webcam.set({
+		  width: 320,
+		  height: 240,
+		  image_format: 'jpeg',
+		  jpeg_quality: 30
+		});
+		Webcam.attach('#my_camera');
+
+		var canvas = document.getElementById('viewport'),
+		  context = canvas.getContext('2d');
+
+		
+
+		</script>
+    </body>
+</html>

@@ -16,6 +16,7 @@
 </head>
 <script>
 	var initialized = false;
+	//var canvas = document.getElementById('viewport');
 	window.onload = function() {
 		if (initialized)
 			return; // if yes, then do not initialize everything again
@@ -67,10 +68,44 @@
 
 			for (i = 0; i < dets.length; ++i)
 				if (dets[i][3] > 50.0) {
+
 					if(!isDetec)
 						{
-							
+							console.log('See');
+							var canvas = document.getElementById('viewport'),
+		  						context = canvas.getContext('2d');
+							var video = document.getElementById('video')
+							base_image = new Image();
+							base_image.src = video.toDataURL('image/jpeg');
+							base_image.onload = function() {
+								context.drawImage(base_image, 0, 0);
+								let data = canvas.toDataURL('image/jpeg');
+								var params = {
+												"returnFaceId": "true",
+												"returnFaceLandmarks": "false",
+												"returnFaceAttributes":
+												"age,gender,headPose,smile,facialHair,glasses,emotion," +
+												"hair,makeup,occlusion,accessories,blur,exposure,noise"
+								};
+								fetch(data)
+									.then(res => res.blob())
+									.then(blobData => {
+									$.post({
+										url: "https://vivi-face.cognitiveservices.azure.com/face/v1.0/detect"+ "?" + $.param(params),
+										contentType: "application/octet-stream",
+										headers: {
+											'Ocp-Apim-Subscription-Key': '3d8a586160484594a4f177462c452eb8'
+									},
+									processData: false,
+									data: blobData
+								}).done(function(data) {
+									$("#results").text(JSON.stringify(data));
+								}).fail(function(err) {
+									$("#results").text(JSON.stringify(err));
+								})
+							});
 						}
+					}
 					isDetec=true;
 				}
 		}
@@ -94,7 +129,7 @@
 					lt-md-x-0 lt-md-y-0 lt-md-w-1 lt-md-h-1 
 					lt-lg-x-0 lt-lg-y-0 lt-lg-w-1 lt-lg-h-1">
 					<div class="lt-body note">
-						<canvas width=640 height=480></canvas>
+						<canvas id="video" width=640 height=480></canvas>
 					</div>
 			</div>
 			<div draggable="true" class="lt
@@ -104,7 +139,7 @@
 					lt-lg-x-1 lt-lg-y-0 lt-lg-w-1 lt-lg-h-2">
 				<div class="lt-body note">
 					<div>Your results will appear below:
-						<pre id="results">	</pre>
+						<p id="results">	</p>
 					</div>
 				</div>
 			</div>
@@ -114,7 +149,7 @@
 					lt-md-x-1 lt-md-y-0 lt-md-w-1 lt-md-h-1
 					lt-lg-x-0 lt-lg-y-1 lt-lg-w-1 lt-lg-h-1">
 				<div class="lt-body note">
-					
+					<canvas id="viewport" width="320" height="240"></canvas>
 				</div>
 			</div>
 			<div draggable="true" class="lt
